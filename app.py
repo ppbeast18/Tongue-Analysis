@@ -35,9 +35,10 @@ for layer in unet_config["config"]["layers"]:
     if "config" in layer and "batch_shape" in layer["config"]:
         del layer["config"]["batch_shape"]
 
-segment_model = model_from_json(
-    json.dumps(unet_config),
-    custom_objects={'dice_coef': dice_coef}
+segment_model = load_model(
+    weights_path,
+    custom_objects={'dice_coef': dice_coef},
+    compile=False
 )
 segment_model.load_weights(weights_path)
 classifier_model = load_model(classifier_path, custom_objects={'dice_coef': dice_coef}, compile=False)
