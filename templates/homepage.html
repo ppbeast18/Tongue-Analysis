@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tongue Classification and Medical Diagnosis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Reset and Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #e8d5f2 50%, #c9e4ff 75%, #d4f1f4 100%);
+      background-attachment: fixed;
+      padding: 40px;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    h1 { 
+      text-align: center; 
+      font-size: 26px; 
+      font-weight: 700; 
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #d63031 0%, #e55039 50%, #f368e0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    p.subtitle { 
+      text-align: center; 
+      color: #555; 
+      margin-bottom: 32px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 248, 255, 0.93) 100%);
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .upload-box h3, .guidelines h3 { font-size: 18px; margin-bottom: 18px; }
+
+    .drop-area {
+      border: 2px dashed #e6e9ef;
+      border-radius: 12px;
+      padding: 20px;
+      background: linear-gradient(135deg, #fbfdff 0%, #f0f7ff 50%, #fff5f7 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+      min-height: 220px;
+    }
+
+    .drop-area:hover { 
+      border-color: #00bcd4; 
+      background: linear-gradient(135deg, #e1f5ff 0%, #e0f2f1 100%);
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.15);
+    }
+    .drop-area i { font-size: 42px; color: #007bff; }
+
+    .form-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+    .file-name-display {
+      margin-top: 5px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #007bff;
+      font-weight: 600;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .btn-group { display: flex; gap: 10px; width: 100%; margin-top: 5px; }
+    .choose-btn { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff; 
+      border: none; 
+      padding: 12px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 15px; 
+      font-weight: 600; 
+      flex: 1; 
+      transition: 0.3s; 
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .camera-btn { 
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: #fff; 
+      border: none; 
+      padding: 12px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 15px; 
+      font-weight: 600; 
+      flex: 1; 
+      transition: 0.3s; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+
+    .choose-btn:hover, .camera-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .warning-note {
+      background: #fff5f5;
+      border-left: 4px solid #f87171;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 13px;
+      color: #b91c1c;
+      border-radius: 4px;
+      line-height: 1.4;
+      width: 100%;
+    }
+
+    .small-note { font-size: 12px; color: #666; margin-top: 10px; text-align: center; }
+
+    /* Format Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 50%, #fff5f7 100%);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 850px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-modal { font-size: 28px; font-weight: bold; cursor: pointer; color: #64748b; }
+
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .example-item img {
+      width: 100%;
+      border-radius: 10px;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border: 3px solid #e2e8f0;
+    }
+
+    .correct img { border-color: #22c55e; }
+    .incorrect img { border-color: #ef4444; }
+
+    /* Camera Modal */
+    #camera-modal { 
+        display: none; 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.95); 
+        z-index: 1000; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    #camera-modal > div { 
+        position: relative; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    #video { 
+        width: 90%; 
+        max-width: 480px; 
+        border-radius: 15px; 
+        border: 3px solid #fff; 
+        background: #000; 
+        display: block;
+    }
+    #guide-box { 
+        box-shadow: 0 0 0 9999px rgba(0,0,0,0.5) !important;
+    }
+    .shutter-btn { 
+        width: 70px; 
+        height: 70px; 
+        background: #fff; 
+        border-radius: 50%; 
+        border: 6px solid rgba(255,255,255,0.3); 
+        margin-top: 25px; 
+        cursor: pointer; 
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .shutter-btn:hover { 
+        transform: scale(1.05); 
+        box-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+    .shutter-btn:active { 
+        transform: scale(0.95);
+    }
+    .close-camera { 
+        position: absolute; 
+        top: 25px; 
+        right: 25px; 
+        color: #fff; 
+        font-size: 35px; 
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .close-camera:hover { 
+        opacity: 0.7;
+    }
+
+    /* Guidelines (Restored Original) */
+    .guideline {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .guideline i {
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .guideline h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .guideline p { color: #444; line-height: 1.35; }
+
+    .red { background: linear-gradient(135deg, #ffe8e8 0%, #ffd4d4 100%); color: #c8232c; }
+    .yellow { background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%); color: #b77900; }
+    .blue { background: linear-gradient(135deg, #e7f3ff 0%, #d0e8ff 100%); color: #0366b8; }
+    .green { background: linear-gradient(135deg, #e8f8f0 0%, #d4f0e6 100%); color: #117a57; }
+
+    .guideline .text { flex: 1; }
+
+    @media (max-width: 900px) {
+      .container { flex-direction: column; }
+      .example-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tongue Classification and Medical Diagnosis</h1>
+  <p class="subtitle">Advanced AI-powered analysis for comprehensive health assessment</p>
+
+  <div class="container">
+    <div class="card upload-box">
+      <h3>Analyze Tongue Image</h3>
+
+      <form action="/predict" method="POST" enctype="multipart/form-data" id="upload-form" class="form-container">
+        <label class="drop-area" id="drop-area">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Drop your tongue image here or click to browse</p>
+            <input type="file" id="file-input" name="file" accept=".jpg,.jpeg,.png" hidden>
+        </label>
+        
+        <div id="file-name-display" class="file-name-display"></div>
+
+        <div class="btn-group">
+            <button class="choose-btn" type="submit">Upload File</button>
+            <button type="button" class="camera-btn" onclick="startCamera()">
+                <i class="fas fa-camera"></i> Scan Live
+            </button>
+        </div>
+
+        <div class="warning-note">
+            <strong>Important:</strong> Please provide images of the <strong>tongue only</strong>. 
+            <span id="format-link" onclick="openFormatModal()" style="color:#007bff; text-decoration:underline; cursor:pointer; font-weight:600;">Click here</span> 
+            to see correct format examples.
+        </div>
+      </form>
+      <p class="small-note">Supported: JPG, PNG, WEBP (Max 10MB)</p>
+    </div>
+
+    <div class="card guidelines">
+      <h3>Important Guidelines</h3>
+
+      <div class="guideline red">
+        <i class="fas fa-utensils"></i>
+        <div class="text">
+          <h4>Avoid Recent Food Consumption</h4>
+          <p>Do not upload any tongue image immediately after eating. Wait at least 30 minutes for accurate results.</p>
+        </div>
+      </div>
+
+      <div class="guideline yellow">
+        <i class="fas fa-sun"></i>
+        <div class="text">
+          <h4>Ensure Natural Lighting</h4>
+          <p>Make sure you have natural lighting without specific focus. Avoid harsh shadows or artificial color casts.</p>
+        </div>
+      </div>
+
+      <div class="guideline blue">
+        <i class="fas fa-tint"></i>
+        <div class="text">
+          <h4>Clean Mouth Before Capture</h4>
+          <p>Upload image after washing your mouth when you have an uncomfortable feeling. This ensures the most accurate diagnosis.</p>
+        </div>
+      </div>
+
+      <div class="guideline green">
+        <i class="fas fa-heartbeat"></i>
+        <div class="text">
+          <h4>Medical Benefits</h4>
+          <p>AI-powered tongue analysis can help identify potential health concerns early, supporting preventive healthcare and wellness monitoring.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="formatModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color: #1e293b;">Format Guide</h3>
+        <span class="close-modal" onclick="closeFormatModal()">&times;</span>
+      </div>
+      
+      <div class="example-row">
+        <h4 style="color: #22c55e; margin-bottom: 10px;">Correct Format (Accepted)</h4>
+        <div class="example-grid">
+          <div class="example-item correct"><img src="{{ url_for('static', filename='examples/correct1.jpeg') }}" alt="Correct 1"></div>
+          <div class="example-item correct"><img src="{{ url_for('static', filename='examples/correct2.jpeg') }}" alt="Correct 2"></div>
+          <div class="example-item correct"><img src="{{ url_for('static', filename='examples/correct3.jpeg') }}" alt="Correct 3"></div>
+          <div class="example-item correct"><img src="{{ url_for('static', filename='examples/correct4.jpeg') }}" alt="Correct 4"></div>
+        </div>
+      </div>
+
+      <div class="example-row">
+        <h4 style="color: #ef4444; margin-bottom: 10px;">Incorrect Format (May cause errors)</h4>
+        <div class="example-grid">
+          <div class="example-item incorrect"><img src="{{ url_for('static', filename='examples/incorrect1.jpeg') }}" alt="Incorrect 1"></div>
+          <div class="example-item incorrect"><img src="{{ url_for('static', filename='examples/incorrect2.jpeg') }}" alt="Incorrect 2"></div>
+          <div class="example-item incorrect"><img src="{{ url_for('static', filename='examples/incorrect3.jpeg') }}" alt="Incorrect 3"></div>
+          <div class="example-item incorrect"><img src="{{ url_for('static', filename='examples/incorrect4.jpeg') }}" alt="Incorrect 4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="camera-modal">
+      <span class="close-camera" onclick="stopCamera()">&times;</span>
+      
+      <div style="position: relative;">
+          <video id="video" autoplay playsinline></video>
+          
+          <!-- Guide Box for Proper Framing -->
+          <div id="guide-box" style="
+              position:absolute;
+              top:50%;
+              left:50%;
+              transform:translate(-50%, -50%);
+              width:140px;
+              height:140px;
+              border:3px solid #00ff00;
+              box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+          "></div>
+      </div>
+      
+      <div class="shutter-btn" onclick="takeSnapshot()"></div>
+      <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const video = document.getElementById('video');
+    const cameraModal = document.getElementById('camera-modal');
+    const formatModal = document.getElementById('formatModal');
+    const canvas = document.getElementById('canvas');
+    const form = document.getElementById('upload-form');
+    const dropArea = document.getElementById('drop-area');
+    let stream = null; // Store stream globally for proper cleanup
+
+    // 1. FORM VALIDATION CHECK
+    form.onsubmit = function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault(); // Stop submission
+            alert("Please select or capture a tongue image first!"); //
+            return false;
+        }
+    };
+
+    // 2. Modal Logic
+    function openFormatModal() { formatModal.style.display = "block"; }
+    function closeFormatModal() { formatModal.style.display = "none"; }
+    window.onclick = function(e) { if (e.target == formatModal) closeFormatModal(); }
+
+    // 3. File Selection UI
+    fileInput.addEventListener('change', (e) => {
+      const fileName = e.target.files[0]?.name;
+      fileNameDisplay.textContent = fileName ? "Selected: " + fileName : "";
+    });
+
+    // 4. Camera Controls with Cropping
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                audio: false 
+            });
+            video.srcObject = stream;
+            cameraModal.style.display = 'flex';
+        } catch (err) { 
+            alert("Camera Error: " + err.message); 
+        }
+    }
+
+    function stopCamera() {
+        if (stream) { 
+            stream.getTracks().forEach(track => track.stop()); 
+            stream = null;
+        }
+        cameraModal.style.display = 'none';
+    }
+
+    function takeSnapshot() {
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions to match video frame
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw full video frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Calculate center box dimensions (140x140 as per guide box)
+        const boxSize = 180;
+        const boxX = (canvas.width / 2) - (boxSize / 2);
+        const boxY = (canvas.height / 2) - (boxSize / 2);
+        
+        // Extract only the center box area
+        const imageData = ctx.getImageData(boxX, boxY, boxSize, boxSize);
+        
+        // Create temporary canvas for cropped image
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = boxSize;
+        tempCanvas.height = boxSize;
+        tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+        
+        // Convert cropped image to file and submit
+        tempCanvas.toBlob((blob) => {
+            const capturedFile = new File([blob], "tongue_capture.jpg", { type: "image/jpeg" });
+            const dt = new DataTransfer();
+            dt.items.add(capturedFile);
+            fileInput.files = dt.files;
+            fileNameDisplay.textContent = "Selected: tongue_capture.jpg";
+            stopCamera();
+            form.submit();
+        }, 'image/jpeg', 0.95); // 0.95 = high quality JPEG
+    }
+
+    // 5. Drag and Drop
+    ['dragenter','dragover'].forEach(evt => dropArea.addEventListener(evt, (e) => { 
+        e.preventDefault(); 
+        dropArea.style.borderColor = '#007bff'; 
+    }));
+    
+    ['dragleave','drop'].forEach(evt => dropArea.addEventListener(evt, (e) => { 
+        e.preventDefault(); 
+        dropArea.style.borderColor = '#e6e9ef'; 
+    }));
+    
+    dropArea.addEventListener('drop', (e) => {
+      if (e.dataTransfer?.files?.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileNameDisplay.textContent = "Selected: " + e.dataTransfer.files[0].name;
+      }
+    });
+  </script>
+</body>
+</html>

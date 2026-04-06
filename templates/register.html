@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediTongue - Register</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f6f8fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      width: 90%;
+      max-width: 1100px;
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Left Side */
+    .left {
+      flex: 1;
+      padding: 40px;
+      background: linear-gradient(to bottom right, #e8f1ff, #ffffff);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .left h1 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    .left p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .left img {
+      width: 100%;
+      border-radius: 10px;
+      height: 75%;
+    }
+
+    /* Right Side */
+    .right {
+      flex: 1;
+      padding: 40px;
+      background: #fff;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tabs button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: #f2f4f7;
+      cursor: pointer;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+
+    .tabs button.active {
+      background: #e0e7ff;
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .right h2 {
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .right p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Side -->
+    <div class="left">
+      <h1>Welcome to MediTongue</h1>
+      <p>Advanced AI-powered tongue analysis for accurate health diagnostics</p>
+      <img src="image.jpeg" alt="Medical Theme">
+    </div>
+
+    <!-- Right Side -->
+    <div class="right">
+      <div class="tabs">
+        <button>Login</button>
+        <button class="active">Register</button>
+      </div>
+      <h2>Create Account</h2>
+      <p>Join us for advanced medical diagnostics</p>
+
+      <form>
+        <div class="form-group">
+          <input type="text" placeholder="Full Name" required>
+        </div>
+        <div class="form-group">
+          <input type="tel" placeholder="Mobile Number" required>
+        </div>
+        <div class="form-group">
+          <input type="email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <input type="password" placeholder="Confirm Password" required>
+        </div>
+        <button type="submit" class="btn">Create Account</button>
+      </form>
+
+      <div class="login-link">
+        Already have an account? <a href="#">Login here</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
