@@ -27,21 +27,10 @@ classifier_path = os.path.join(BASE_DIR, 'best_model_effnet_mask.h5')
 
 # with open(config_path, 'r') as f: unet_config = json.load(f)
 # segment_model = model_from_json(json.dumps(unet_config), custom_objects={'dice_coef': dice_coef})
-with open(config_path, 'r') as f:
-    unet_config = json.load(f)
-
-# 🔥 FIX: Remove batch_shape from all layers
-for layer in unet_config["config"]["layers"]:
-    if "config" in layer and "batch_shape" in layer["config"]:
-        del layer["config"]["batch_shape"]
-
-segment_model = load_model(
-    weights_path,
-    custom_objects={'dice_coef': dice_coef},
-    compile=False
-)
-segment_model.load_weights(weights_path)
-classifier_model = load_model(classifier_path, custom_objects={'dice_coef': dice_coef}, compile=False)
+# segment_model.load_weights(weights_path)
+# classifier_model = load_model(classifier_path, custom_objects={'dice_coef': dice_coef}, compile=False)
+segment_model = load_model("segment_model.h5", custom_objects={'dice_coef': dice_coef})
+classifier_model = load_model("best_model_effnet_mask.h5", compile=False)
 
 CLASS_MAP = {
     0: {"label": "Light Yellow", "stats": "Indicates mild internal heat. May suggest mild dehydration."},
